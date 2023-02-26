@@ -16,19 +16,39 @@ type TItems<T> = {
 export const StackPage: React.FC = () => {
   const stack = new Stack<string>();
   const [items, setItems] = useState<Array<TItems<string>>>([]);
+  const [loader, setLoader] = useState(false)
+  const [disabled, setDisabled] = useState(true);
+
+  const onChange = (e: FormEvent<HTMLInputElement>) => {
+    debugger
+    if ((e.target as HTMLInputElement).value === '') {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }
+
 
   const onSubmit = (e: FormEvent): void => {
     e.preventDefault();
+    setLoader(true);
     const input: HTMLInputElement = document.querySelector('input')!;
     const el: string = input.value;
-    stack.push(el);
-    setItems([...items, {value: el, color: ElementStates.Changing}]);
+    if(el !== '') {
+      stack.push(el);
+      setItems([...items, {value: el, color: ElementStates.Changing}]);
+    }
     input.value = '';
+    setDisabled(true)
+    setLoader(false)
   }
 
   const onDelete = (): void => {
+    setLoader(true);
+    setColor(items);
+    setTimeout(setItems, DELAY_IN_MS, [...items.slice(0, -1)])
     stack.pop();
-    setItems([...items.slice(0, -1)]);
+    setLoader(false)
   }
   const setColor = (items: Array<TItems<string>>) => {
     const arr = items;
@@ -40,34 +60,45 @@ export const StackPage: React.FC = () => {
       }
       return setItems(arr);
     }
-        
   }
 
   const onReset = (): void => {
+    setLoader(true)
     while(stack.getSize()) {
       stack.pop()
     }
     setItems([])
+    setLoader(false)
+
  }
   useEffect(()=>{
     setTimeout(setColor, DELAY_IN_MS, items);
   }, [items])
+  
   return (
     <SolutionLayout title="Стек">
       <form className={style.form} onSubmit={onSubmit} onReset={onReset}>
         <fieldset className={style.container} >
-          <Input maxLength={4} isLimitText={true} />
+          <Input 
+          maxLength={4} 
+          isLimitText={true}
+          onChange={onChange} />
           <Button
             text='Добавить'
-            type='submit' />
+            type='submit' 
+            isLoader={loader}
+            disabled={disabled}
+            />
           <Button
             text="Удалить"
             type='button'
+            isLoader={loader}
             onClick={onDelete} />
         </fieldset>
         <Button
           text="Очистить"
-          type='reset' />
+          type='reset' 
+          isLoader={loader} />
       </form>
       <ul className={style.display}>
         {!!items.length &&
