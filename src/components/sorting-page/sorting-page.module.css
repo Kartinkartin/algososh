@@ -1,0 +1,46 @@
+.form {
+    max-width: 980px;
+    display: flex;
+    gap: 52px;
+    align-items: center;
+    margin: 0 auto;
+    padding-bottom: 48px;
+}
+
+.checkboxes {
+    display: flex;
+    flex-direction: row;
+    border: none;
+    gap: 40px;
+}
+
+.buttonsBox {
+    display: flex;
+    gap: 80px;
+}
+
+.sortButtons {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.arrContainer {
+    min-width: 465px;
+    max-width: 1020px;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.element {
+    list-style: none;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 48px;
+    align-content: end;
+}
