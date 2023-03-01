@@ -28,6 +28,7 @@
 .arrContainer {
     min-width: 465px;
     max-width: 1020px;
+    height: 340px;
     padding: 0;
     margin: 0 auto;
     display: flex;

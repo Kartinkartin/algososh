@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { Direction } from "../../types/direction";
+import { ElementStates } from "../../types/element-states";
 import { Button } from "../ui/button/button";
-import { Circle } from "../ui/circle/circle";
 import { Column } from "../ui/column/column";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
@@ -14,11 +15,21 @@ export const SortingPage: React.FC = () => {
   // Выбор или Пузырек. 
   // Сортировка по возрастанию или убыванию
   const ascendingSortHandler = () => {
-    selectionSortAscending([...arr])
+    const sortType = (document.forms.namedItem('form')?.elements.namedItem('sortType') as RadioNodeList)?.value;
+    if (sortType === 'selectionSort') {
+      selectionSortAscending([...arr])
+    } else {
+      bubbleSortAscending([...arr])
+    }
   }
 
   const descendingSortHandler = () => {
-    selectionSortDescending([...arr])
+    const sortType = (document.forms.namedItem('form')?.elements.namedItem('sortType') as RadioNodeList)?.value;
+    if (sortType === 'selectionSort') {
+      selectionSortDescending([...arr])
+    } else {
+      bubbleSortDescending([...arr])
+    }
   }
 
   const swap = (arr: number[], firstIndex: number, secondIndex: number): void => {
@@ -26,17 +37,20 @@ export const SortingPage: React.FC = () => {
     arr[firstIndex] = arr[secondIndex];
     arr[secondIndex] = temp;
   };
-  
+
   // сортировка выбором по возрастанию
   const selectionSortAscending = (arr: number[]) => {
     const { length } = arr;
     for (let i = 0; i < length; i++) {
       let maxInd = i;
-      for (let j = i+1; j < length; j++) {
-        if (arr[maxInd] > arr[j])
-        {
-          swap(arr, maxInd, j)
-        }
+      for (let j = i + 1; j < length; j++) {
+        setTimeout(setArr, SHORT_DELAY_IN_MS*j, ((arr: number[]) => {
+          if (arr[maxInd] > arr[j]) {
+            swap(arr, maxInd, j)
+          }
+          return [...arr]
+        }))
+        
       }
     }
     setArr([...arr])
@@ -44,24 +58,54 @@ export const SortingPage: React.FC = () => {
   // сортировка выбором по убыванию
   const selectionSortDescending = (arr: number[]) => {
     const { length } = arr;
-    for (let i = 0; i < length ; i++) {
-      let maxInd = i;
-      for (let j = i+1; j < length ; j++) {
-        if (arr[maxInd] < arr[j])
-        {
-          swap(arr, maxInd, j)
-        }
+    for (let i = 0; i < length; i++) {
+      let minInd = i;
+      for (let j = i + 1; j < length; j++) {
+        setTimeout(setArr, SHORT_DELAY_IN_MS*(j+i), ((arr: number[]) => {
+          if (arr[minInd] < arr[j]) {
+            swap(arr, minInd, j)
+          }
+          return [...arr]
+        }))
+        
       }
     }
     setArr([...arr])
 
   };
 
-  //Сортировка пузырьком — один из самых известных алгоритмов сортировки. 
-  // Здесь нужно последовательно сравнивать значения соседних элементов
-  // и менять числа местами, если предыдущее оказывается больше последующего.
-  // Таким образом элементы с большими значениями оказываются в конце списка,
-  // а с меньшими остаются в начале.
+  //Сортировка пузырьком по возрастанию
+  const bubbleSortAscending = (arr: number[]) => {
+    const { length } = arr;
+    for (let i = 0; i < length-1; i++) {
+      for (let j = 0; j < length - i; j++) {
+        setTimeout(setArr, SHORT_DELAY_IN_MS*(j+i),((arr) => {
+          if (arr[i] > arr[i + 1]) {
+            swap(arr, i, i + 1)
+          }
+          return [...arr]
+        }))
+        
+      }
+    }
+    setArr([...arr])
+  }
+  //Сортировка пузырьком по возрастанию
+  const bubbleSortDescending = (arr: number[]) => {
+    // console.log(arr)
+    const { length } = arr;
+    for (let i = 0; i < length - 1; i++) {
+      for (let j = 0; j < length - i; j++) {
+        setTimeout(setArr, SHORT_DELAY_IN_MS*(j+i), ((arr) => {
+          if (arr[i] < arr[i + 1]) {
+            swap(arr, i, i + 1)
+          }
+          // console.log(`i=${i}, j=${j}, ${arr}`)
+          return [...arr]
+        }))
+      }
+    }
+  }
 
   const randomArr = () => {
     // массив должен состоять из целых чисел [0;100],
@@ -80,10 +124,10 @@ export const SortingPage: React.FC = () => {
 
   return (
     <SolutionLayout title="Сортировка массива">
-      <form className={style.form}>
+      <form className={style.form} name='form'>
         <fieldset className={style.checkboxes}>
-          <RadioInput label='Выбор' name='sortType' defaultChecked />
-          <RadioInput label='Пузырёк' name='sortType' />
+          <RadioInput label='Выбор' name='sortType' value='selectionSort' defaultChecked />
+          <RadioInput label='Пузырёк' name='sortType' value='bubbleSort' />
         </fieldset>
         <div className={style.buttonsBox}>
           <div className={style.sortButtons}>
@@ -96,7 +140,9 @@ export const SortingPage: React.FC = () => {
       <ul className={style.arrContainer}>
         {arr && arr.map((item, index) => (
           <li className={style.element} key={index} >
-            <Column index={item} />
+            <Column 
+            index={item}
+            state={ElementStates.Default} />
           </li>
         ))}
       </ul>
