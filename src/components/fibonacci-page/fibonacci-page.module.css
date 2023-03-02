@@ -9,7 +9,7 @@
 .form {
     display: flex;
     flex-direction: row;
-    max-width: 520px;
+    min-width: 570px;
 }
 
 .container {

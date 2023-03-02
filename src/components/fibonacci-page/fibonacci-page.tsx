@@ -19,7 +19,6 @@ export const FibonacciPage: React.FC = () => {
     const input = (e.target as HTMLFormElement)[0];
     const data: string = (input as HTMLInputElement).value;
     calcFib(data);
-    (input as HTMLInputElement).value = '';
   }
 
   const onChange = (e: FormEvent<HTMLInputElement>): void => {
@@ -67,12 +66,17 @@ export const FibonacciPage: React.FC = () => {
             isLimitText={true}
             onChange={onChange}
           />
+          <div>
           <Button
             text='Рассчитать'
             type='submit'
             isLoader={loader}
             disabled={isDisable}
+            extraClass='ml-6'
+            linkedList="small"
           />
+          </div>
+          
         </form>
         <ul className={style.container}>
           {items && items.map((item, index) =>
