@@ -9,10 +9,11 @@
 .form {
     display: flex;
     flex-direction: row;
-    max-width: 520px;
+    min-width: 520px;
 }
 
 .container {
+    padding: 0;
     min-width: 465px;
     display: flex;
     flex-direction: row;
