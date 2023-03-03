@@ -18,8 +18,8 @@ export class Stack<T> implements IStack<T> {
     };
 
     peak = (): T | null => {
-        if (this.container.length === null) {
-            return null;
+        if (this.container.length) {
+            return this.container[this.container.length - 1]
         }
         return null
     };

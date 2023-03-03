@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from "react";
-import { DELAY_IN_MS } from "../../constants/delays";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { ElementStates } from "../../types/element-states";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
@@ -10,7 +10,7 @@ import style from './stack-page.module.css';
 
 type TItems<T> = {
   value: T;
-  color?: ElementStates.Default | ElementStates.Changing ;
+  color?: ElementStates.Default | ElementStates.Changing;
 }
 
 export const StackPage: React.FC = () => {
@@ -20,7 +20,6 @@ export const StackPage: React.FC = () => {
   const [disabled, setDisabled] = useState(true);
 
   const onChange = (e: FormEvent<HTMLInputElement>) => {
-    debugger
     if ((e.target as HTMLInputElement).value === '') {
       setDisabled(true);
     } else {
@@ -34,61 +33,64 @@ export const StackPage: React.FC = () => {
     setLoader(true);
     const input: HTMLInputElement = document.querySelector('input')!;
     const el: string = input.value;
-    if(el !== '') {
+    if (el !== '') {
       stack.push(el);
-      setItems([...items, {value: el, color: ElementStates.Changing}]);
+      setItems([...items, { value: el, color: ElementStates.Changing }]);
     }
     input.value = '';
     setDisabled(true)
-    setLoader(false)
+    
+    setTimeout(setItems, SHORT_DELAY_IN_MS, ((items: Array<TItems<string>> | []) => {
+      const arr = items;
+      if (arr.length) {
+        arr[arr.length - 1].color = ElementStates.Default
+      }
+      setLoader(false);
+      return [...arr];
+    }))
   }
 
   const onDelete = (): void => {
     setLoader(true);
-    setColor(items);
-    setTimeout(setItems, DELAY_IN_MS, [...items.slice(0, -1)])
-    stack.pop();
-    setLoader(false)
-  }
-  const setColor = (items: Array<TItems<string>>) => {
-    const arr = items;
-    if(items.length) {
-      if(arr[arr.length-1].color === ElementStates.Default){
-        arr[arr.length-1].color = ElementStates.Changing
-      } else {
-        arr[arr.length-1].color = ElementStates.Default
+    setItems((items: Array<TItems<string>> | []) => {
+      const arr = items;
+      if (arr.length) {
+        arr[arr.length - 1].color = ElementStates.Changing
       }
-      return setItems(arr);
-    }
+      return [...arr];
+    })
+    function deleteHandle() {
+      setItems([...items.slice(0, -1)]);
+      stack.pop();
+      setLoader(false)
+    } 
+    setTimeout(deleteHandle, SHORT_DELAY_IN_MS)
   }
 
   const onReset = (): void => {
     setLoader(true)
-    while(stack.getSize()) {
+    while (stack.getSize()) {
       stack.pop()
     }
     setItems([])
     setLoader(false)
 
- }
-  useEffect(()=>{
-    setTimeout(setColor, DELAY_IN_MS, items);
-  }, [items])
-  
+  }
+
   return (
     <SolutionLayout title="Стек">
       <form className={style.form} onSubmit={onSubmit} onReset={onReset}>
         <fieldset className={style.container} >
-          <Input 
-          maxLength={4} 
-          isLimitText={true}
-          onChange={onChange} />
+          <Input
+            maxLength={4}
+            isLimitText={true}
+            onChange={onChange} />
           <Button
             text='Добавить'
-            type='submit' 
+            type='submit'
             isLoader={loader}
             disabled={disabled}
-            />
+          />
           <Button
             text="Удалить"
             type='button'
@@ -97,20 +99,21 @@ export const StackPage: React.FC = () => {
         </fieldset>
         <Button
           text="Очистить"
-          type='reset' 
+          type='reset'
           isLoader={loader} />
       </form>
       <ul className={style.display}>
         {!!items.length &&
           (items.map((item, index) => {
-            const head: string | null = items.length-index ==1 ? 'top' : null;
+            const head: string | null = items.length - index === 1 ? 'top' : null;
             if (item) {
-              return ( <Circle 
-              letter={item.value} 
-              index={index} 
-              head={head} 
-              state={item.color} 
-              key={index} />)
+              return (<Circle
+                letter={item.value}
+                index={index}
+                head={head}
+                state={item.color}
+                key={index}
+                extraClass='ml-6 mr-6' />)
             }
           }
           ))
