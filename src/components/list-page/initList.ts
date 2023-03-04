@@ -9,14 +9,17 @@ export class Node<T> {
 
 interface ILinkedList<T> {
     // добавить в конец
-    append: (element: T) => void;
+    appendTail: (element: T) => void;
     // добавить в начало
-
+    appendHead: (element: T) => void;
     // добавить по индексу
     insertAt: (element: T, position: number) => void;
+    // удалить по индексу
+    removeAt: (position: number) => void;
     // удалить с начала
-
+    removeHead: () => void;
     // удалить с конца
+    removeTail: () => void;
     getSize: () => number;
     print: () => void;
 }
@@ -56,7 +59,32 @@ export class LinkedList<T> implements ILinkedList<T> {
         }
     }
 
-    append(element: T) {
+    removeAt(index: number) {
+        if (index < 0 || index > this.size) {
+            console.log('Enter a valid index');
+            return;
+        } else {
+            if(this.head !== null) {
+                if (index === 0) {
+                    // удалить первый элемент
+                    this.head = this.head.next;
+                } else {
+                    let curr: Node<T> | null = this.head;
+                    let currIndex = 0;
+                    // перебрать элементы в списке до нужной позиции
+                    while (currIndex < index - 1) {
+                        curr = curr!.next;
+                        currIndex++;
+                    }
+                    // добавить элемент
+                    curr!.next = curr!.next?.next ? curr!.next.next : null;
+                }
+                this.size--;
+            }
+        }
+    }
+
+    appendTail(element: T) {
         const node = new Node(element);
         let current;
         if (this.head === null) {
@@ -69,6 +97,33 @@ export class LinkedList<T> implements ILinkedList<T> {
             current.next = node;
         }
         this.size++;
+    }
+
+    appendHead(element: T) {
+        const node = new Node(element);
+        let tmp = this.head;
+        this.head = node;
+        node.next = tmp;
+        this.size++;
+    }
+
+    removeHead() {
+        if (this.head) {
+            this.head = this.head.next;
+            this.size--;
+        }
+        
+    }
+    removeTail() {
+        let current;
+        if (this.head !== null) {
+            current = this.head;
+            while (current.next?.next) {
+                current = current.next;
+            }
+            current.next = null;
+        }
+        this.size--;
     }
 
     getSize() {
