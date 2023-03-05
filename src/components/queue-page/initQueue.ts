@@ -65,3 +65,4 @@ interface IQueue<T> {
   
     isEmpty = () => this.length === 0;
   }
+  
