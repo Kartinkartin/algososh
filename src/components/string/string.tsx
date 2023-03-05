@@ -8,8 +8,8 @@ import { DELAY_IN_MS } from "../../constants/delays";
 import { ElementStates } from "../../types/element-states";
 
 export const StringComponent: React.FC = () => {
-  const [loader, setLoader] = useState(false);
-  const [isDisabled, setDisabled] = useState(true);
+  const [loader, setLoader] = useState<boolean>(false);
+  const [isDisabled, setDisabled] = useState<boolean>(true);
   const [letters, setLetters] = useState<Array<string> | null>(null)
   const [counter, setCounter] = useState<number>(-1);
   const input = (document.forms.namedItem('reverseForm')?.elements[0] as HTMLInputElement);
@@ -36,24 +36,27 @@ export const StringComponent: React.FC = () => {
     const arr = str.split('');
     setLetters(arr);
   }
+
   //меняет местами два элемента 
   const swap = (arr: Array<string>, index: number) => {
     const tmp = arr[index];
     arr[index] = arr[arr.length - 1 - index];
     arr[arr.length - 1 - index] = tmp;
   }
-  // устанавливает цвет элемента
+
+  // устанавливает цвет
   const typeHandler = (arr: Array<string>, index: number, counter: number) => {
     if (index < counter || index > arr.length - 1 - counter) { 
-      return ElementStates.Changing 
+      return ElementStates.Modified 
     }
     if (index > counter && index < arr.length - 1 - counter) { 
       return ElementStates.Default 
     }
     if (index === counter || index === arr.length - 1 - counter) { 
-      return ElementStates.Modified 
+      return ElementStates.Changing 
     }
   }
+
   useEffect(() => {
     if (counter === -1) {
       setTimeout(setCounter, DELAY_IN_MS, 0);

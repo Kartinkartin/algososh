@@ -1,3 +1,5 @@
+import { ElementStates } from "../../types/element-states";
+
 export class Node<T> {
     value: T
     next: Node<T> | null
@@ -5,6 +7,11 @@ export class Node<T> {
         this.value = value;
         this.next = (next === undefined ? null : next);
     }
+}
+
+export type TPoint = {
+    value: string,
+    state: ElementStates
 }
 
 interface ILinkedList<T> {
@@ -76,7 +83,7 @@ export class LinkedList<T> implements ILinkedList<T> {
                         curr = curr!.next;
                         currIndex++;
                     }
-                    // добавить элемент
+                    // удалить элемент
                     curr!.next = curr!.next?.next ? curr!.next.next : null;
                 }
                 this.size--;

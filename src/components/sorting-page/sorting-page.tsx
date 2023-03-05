@@ -159,9 +159,6 @@ export const SortingPage: React.FC = () => {
   }
 
   useEffect(() => {
-    setSortedInex(null);
-    setSorting([]);
-    setArr([]);
     randomArr();
   }, [])
 

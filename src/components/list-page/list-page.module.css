@@ -33,9 +33,28 @@
     
 }
 
-.item {
+.item_container {
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-top: 56px;
+    padding-bottom: 56px;
+}
+
+.item {
     display: flex;
     flex-direction: row;
     align-items: center;
+    padding-bottom: 36px;
+}
+
+.upper_container {
+    position: absolute;
+    top: 0;
+}
+
+.lower_container {
+   position: absolute;
+   bottom: 0; 
 }
