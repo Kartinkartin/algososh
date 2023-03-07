@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { HEAD, TAIL } from "../../constants/element-captions";
+import { useForm } from "../../hooks/useForm";
 import { ElementStates } from "../../types/element-states";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
-import { Node, LinkedList, TPoint } from "./initList";
+import { LinkedList, TPoint } from "./initList";
 import styles from './list-page.module.css';
 
 const list = new LinkedList<TPoint>();
@@ -21,16 +22,15 @@ export const ListPage: React.FC = () => {
   const [size, setSize] = useState<number>(() => list.getSize());
   const [items, setItems] = useState<Array<TPoint | null>>([]);
   const [smallValue, setSmallValue] = useState<TPoint | null>(null);
-  const [indexDisabled, setIndexDisabled] = useState(true);
-  const [valueDisabled, setValueDisabled] = useState(true);
+  const valueInput = 'valueInput';
+  const indexInput = 'indexInput';
+  const { values, handleChange, setValues } = useForm({[valueInput]: '', [indexInput]: ''});
   const [isDeleting, setDeleting] = useState(false);
   const [isAdding, setAdding] = useState(false);
 
   const addToHead = () => {
-    const input = document.forms.namedItem('listForm')?.elements.namedItem('valueInput') as HTMLInputElement;
-    const data = input?.value;
+    const data = values[valueInput];
     const newItem: TPoint = { value: data, state: ElementStates.Changing }
-    const arr = [...list.print()];
     setAdding(true);
     setCounter(0);
     setSmallValue(newItem);
@@ -45,19 +45,15 @@ export const ListPage: React.FC = () => {
     const returnToDef = () => {
       list.removeHead();
       list.appendHead({ value: data, state: ElementStates.Default });
-      setItems([...list.print()]);
       setCounter(null);
     }
     setTimeout(returnToDef, SHORT_DELAY_IN_MS * 2);
-    input.value = '';
-
+    setValues({...values, [valueInput]: ''})
   }
 
   const addToTail = () => {
-    const input = document.forms.namedItem('listForm')?.elements.namedItem('valueInput') as HTMLInputElement;
-    const data = input?.value;
+    const data = values[valueInput];
     const newItem: TPoint = { value: data, state: ElementStates.Changing }
-    const arr = [...list.print()];
     setAdding(true);
     setCounter(size - 1);
     setSmallValue(newItem);
@@ -72,11 +68,10 @@ export const ListPage: React.FC = () => {
     const returnToDef = () => {
       list.removeTail();
       list.appendTail({ value: data, state: ElementStates.Default });
-      setItems([...list.print()]);
       setCounter(null);
     }
     setTimeout(returnToDef, SHORT_DELAY_IN_MS * 2);
-    input.value = '';
+    setValues({...values, [valueInput]: ''})
   }
 
   const deleteHead = () => {
@@ -120,10 +115,8 @@ export const ListPage: React.FC = () => {
   }
 
   const addIndex = () => {
-    const inputData = document.forms.namedItem('listForm')?.elements.namedItem('valueInput') as HTMLInputElement;
-    const data: string = inputData.value;
-    const inputIndex = document.forms.namedItem('listForm')?.elements.namedItem('indexInput') as HTMLInputElement;
-    const index: number = +inputIndex.value;
+    const data: string = values[valueInput];
+    const index: number = +values[indexInput];
     setCounter(0);
     setAdding(true);
     setSmallValue({ value: data, state: ElementStates.Changing })
@@ -155,18 +148,14 @@ export const ListPage: React.FC = () => {
     const finishRender = (index: number) => {
       list.removeAt(index);
       list.insertAt({ value: data, state: ElementStates.Default }, index);
-      // setAdding(true);
-      setItems([...list.print()]);
       setCounter(null);
     }
     setTimeout(finishRender, SHORT_DELAY_IN_MS * (index + 2), index);
-    inputData.value = '';
-    inputIndex.value = '';
+    setValues({[valueInput]: '', [indexInput]: ''});
   }
 
   const removeIndex = () => {
-    const inputIndex = document.forms.namedItem('listForm')?.elements.namedItem('indexInput') as HTMLInputElement;
-    const index: number = +inputIndex.value;
+    const index: number = +values[indexInput];
     setCounter(index);
     let arr = [...list.print()]
     setSmallValue({ value: arr[index].value, state: ElementStates.Changing })
@@ -177,7 +166,6 @@ export const ListPage: React.FC = () => {
     }
     // меняет элементы до индекса
     for (let i = 0; i <= index; i++) {
-      const item = { value: arr[i].value, state: ElementStates.Changing }
       setTimeout(circleExchange, SHORT_DELAY_IN_MS * i, (i));
     }
     // отрисовка перед удалением
@@ -201,27 +189,7 @@ export const ListPage: React.FC = () => {
       setCounter(null);
     }
     setTimeout(deleteHandle, SHORT_DELAY_IN_MS * (index + 2));
-    inputIndex.value = '';
-  }
-
-  const onChangeValue = () => {
-    const inputData = document.forms.namedItem('listForm')?.elements.namedItem('valueInput') as HTMLInputElement;
-    const data: string = inputData.value;
-    if (data === '') {
-      setValueDisabled(true);
-    } else {
-      setValueDisabled(false);
-    }
-  }
-
-  const onChangeIndex = () => {
-    const inputIndex = document.forms.namedItem('listForm')?.elements.namedItem('indexInput') as HTMLInputElement;
-    const data: string = inputIndex.value;
-    if (data === '') {
-      setIndexDisabled(true);
-    } else {
-      setIndexDisabled(false);
-    }
+    setValues({...values, [indexInput]: ''});
   }
 
   const printHandle = () => {
@@ -260,7 +228,6 @@ export const ListPage: React.FC = () => {
               </div>)}
         </li>
       )
-
     })
   }
 
@@ -275,7 +242,8 @@ export const ListPage: React.FC = () => {
               isLimitText={true}
               extraClass='pr-6'
               name='valueInput'
-              onChange={onChangeValue} />
+              value={values[valueInput]}
+              onChange={handleChange} />
           </div>
           <Button
             text='Добавить в head'
@@ -283,7 +251,7 @@ export const ListPage: React.FC = () => {
             linkedList="small"
             extraClass='ml-6 mr-6'
             onClick={addToHead}
-            disabled={valueDisabled}
+            disabled={!values[valueInput]}
             isLoader={isAdding || counter !== null} />
           <Button
             text='Добавить в tail'
@@ -291,7 +259,7 @@ export const ListPage: React.FC = () => {
             linkedList="small"
             extraClass='mr-6'
             onClick={addToTail}
-            disabled={valueDisabled}
+            disabled={!values[valueInput]}
             isLoader={isAdding || counter !== null} />
           <Button
             text='Удалить из head'
@@ -299,14 +267,16 @@ export const ListPage: React.FC = () => {
             linkedList="small"
             extraClass='mr-6'
             onClick={deleteHead}
-            isLoader={isAdding || counter !== null} />
+            isLoader={isAdding || counter !== null}
+            disabled={!list.getSize()} />
           <Button
             text='Удалить из tail'
             type='button'
             linkedList="small"
             extraClass='mr-6'
             onClick={deleteTail}
-            isLoader={isAdding || counter !== null} />
+            isLoader={isAdding || counter !== null}
+            disabled={!list.getSize()} />
         </fieldset>
         <fieldset className={styles.form_line}>
           <div className={styles.input}>
@@ -315,7 +285,10 @@ export const ListPage: React.FC = () => {
               extraClass='pr-6'
               type="number"
               name='indexInput'
-              onChange={onChangeIndex}
+              value={values[indexInput]}
+              onChange={handleChange}
+              min='0'
+              max={`${list.getSize()-1}`}
             />
           </div>
           <Button
@@ -324,7 +297,7 @@ export const ListPage: React.FC = () => {
             linkedList="big"
             extraClass='ml-6 mr-6'
             onClick={addIndex}
-            disabled={indexDisabled || valueDisabled}
+            disabled={!values[indexInput] || !values[valueInput]}
             isLoader={isAdding || counter !== null} />
           <Button
             text='Удалить по индексу'
@@ -332,7 +305,7 @@ export const ListPage: React.FC = () => {
             linkedList="big"
             extraClass='mr-6'
             onClick={removeIndex}
-            disabled={indexDisabled}
+            disabled={!values[indexInput]}
             isLoader={isAdding || counter !== null} />
         </fieldset>
       </form>

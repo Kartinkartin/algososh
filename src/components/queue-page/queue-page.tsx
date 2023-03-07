@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { ElementStates } from "../../types/element-states";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
@@ -8,35 +8,26 @@ import { HEAD, TAIL } from "../../constants/element-captions";
 import { Queue } from "./initQueue";
 import style from './queue-page.module.css';
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { useForm } from "../../hooks/useForm";
 
 
 const queue = new Queue<string>(6);
 
 export const QueuePage: React.FC = () => {
-  const [items, setItems] = useState<Array<string | null>>(Array('', '', '', '', '', ''))
+  const [items, setItems] = useState<Array<string | null>>(['', '', '', '', '', ''])
   const [head, setHead] = useState<number | null>(null);
   const [tail, setTail] = useState<number | null>(null);
-  const [disabled, setDisabled] = useState(true);
   const [isDeleting, setDeleting] = useState(false);
   const [isAdding, setAdding] = useState(false);
   const [loader, setLoader] = useState(false);
-
-  const onChange = () => {
-    const input = document.forms?.namedItem('queueForm')?.elements[1] as HTMLInputElement;
-    if(input.value === '') { 
-      setDisabled(true) 
-    } else {
-      setDisabled(false)
-    }
-  }
+  const nameInput = 'queueInput';
+  const { values, handleChange, setValues } = useForm({[nameInput]: ''})
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const input = (e.target as HTMLFormElement).elements[1]
-    const data = (input as HTMLInputElement).value
+    const data = values[nameInput];
     addEl(data);
-    (input as HTMLInputElement).value = '';
-    setDisabled(true);
+    setValues({...values, [nameInput]: ''});
     setLoader(true);
   }
   
@@ -82,7 +73,9 @@ export const QueuePage: React.FC = () => {
 
   const onReset = () => {
     queue.resqueue();
-    setItems(Array('', '', '', '', '', ''))
+    setHead(null);
+    setTail(null);
+    setItems(['', '', '', '', '', ''])
   }
 
   const setColor = (index: number) => {
@@ -102,23 +95,27 @@ export const QueuePage: React.FC = () => {
           <Input
             maxLength={4}
             isLimitText={true}
-            id='input'
-            onChange={onChange} />
+            onChange={handleChange}
+            name={nameInput}
+            value={values[nameInput]}
+          />
           <Button
             text='Добавить'
             type='submit'
-            disabled={disabled}
+            disabled={!values[nameInput]}
             isLoader={loader} />
           <Button
             text="Удалить"
             type='button'
             onClick={onDelete} 
-            isLoader={loader} />
+            isLoader={loader}
+            disabled={head===null || tail===null || head === tail } />
         </fieldset>
         <Button
           text="Очистить"
           type='reset' 
-          isLoader={loader} />
+          isLoader={loader}
+          disabled={head===null || tail===null || head === tail} />
       </form>
       <ul className={style.display}>
         {items && items.map((item, index) =>

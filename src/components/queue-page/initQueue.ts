@@ -21,6 +21,7 @@ interface IQueue<T> {
       this.container = Array(size);
     }
   
+    // добавляет в конец очереди
     enqueue = (item: T) => {
       if (this.length >= this.size) {
         throw new Error("Maximum length exceeded");
@@ -35,6 +36,7 @@ interface IQueue<T> {
      }
     };
   
+    // изымает из головы очереди
     dequeue = () => {
       if (this.isEmpty()) {
         throw new Error("No elements in the queue");
@@ -49,6 +51,8 @@ interface IQueue<T> {
         this.length = this.length -1;
       }
     };
+
+    // сбрасывает всю очередь
     resqueue = () => {
       this.head = 0;
       this.tail = 0;

@@ -1,5 +1,6 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { useForm } from "../../hooks/useForm";
 import { ElementStates } from "../../types/element-states";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
@@ -17,29 +18,18 @@ export const StackPage: React.FC = () => {
   const stack = new Stack<string>();
   const [items, setItems] = useState<Array<TItems<string>>>([]);
   const [loader, setLoader] = useState(false)
-  const [disabled, setDisabled] = useState(true);
-
-  const onChange = (e: FormEvent<HTMLInputElement>) => {
-    if ((e.target as HTMLInputElement).value === '') {
-      setDisabled(true);
-    } else {
-      setDisabled(false);
-    }
-  }
-
+  const nameInput = 'stackInput';
+  const {values, handleChange, setValues} = useForm({[nameInput]: ''});
 
   const onSubmit = (e: FormEvent): void => {
     e.preventDefault();
     setLoader(true);
-    const input: HTMLInputElement = document.querySelector('input')!;
-    const el: string = input.value;
+    const el: string = values[nameInput];
     if (el !== '') {
       stack.push(el);
       setItems([...items, { value: el, color: ElementStates.Changing }]);
     }
-    input.value = '';
-    setDisabled(true)
-    
+    setValues({[nameInput]: ''});
     setTimeout(setItems, SHORT_DELAY_IN_MS, ((items: Array<TItems<string>> | []) => {
       const arr = items;
       if (arr.length) {
@@ -84,23 +74,27 @@ export const StackPage: React.FC = () => {
           <Input
             maxLength={4}
             isLimitText={true}
-            onChange={onChange} />
+            value={values[nameInput]}
+            onChange={handleChange}
+            name={nameInput} />
           <Button
             text='Добавить'
             type='submit'
             isLoader={loader}
-            disabled={disabled}
+            disabled={!values[nameInput]}
           />
           <Button
             text="Удалить"
             type='button'
             isLoader={loader}
-            onClick={onDelete} />
+            onClick={onDelete}
+            disabled={!items.length}  />
         </fieldset>
         <Button
           text="Очистить"
           type='reset'
-          isLoader={loader} />
+          isLoader={loader}
+          disabled={!items.length} />
       </form>
       <ul className={style.display}>
         {!!items.length &&
@@ -115,6 +109,7 @@ export const StackPage: React.FC = () => {
                 key={index}
                 extraClass='ml-6 mr-6' />)
             }
+            return null
           }
           ))
         }

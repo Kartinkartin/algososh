@@ -1,4 +1,5 @@
 import React, { FormEvent, useEffect, useState } from "react";
+import { useForm } from "../../hooks/useForm";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
@@ -9,21 +10,16 @@ import style from './fibonacci-page.module.css';
 export const FibonacciPage: React.FC = () => {
   const [items, setItems] = useState<Array<number>>([]);
   const [loader, setLoader] = useState(false);
-  const [isDisable, setDisable] = useState(true);
-  const [n, setN] = useState<number | undefined>(undefined)
+  const [n, setN] = useState<number | undefined>(undefined);
+  const inputName = 'numInput';
+  const { values, handleChange, setValues } = useForm({[inputName]: ''});
 
   const onSubmit = (e: FormEvent): void => {
     e.preventDefault();
     setLoader(true);
     setItems([]);
-    const input = (e.target as HTMLFormElement)[0];
-    const data: string = (input as HTMLInputElement).value;
-    calcFib(data);
-  }
-
-  const onChange = (e: FormEvent<HTMLInputElement>): void => {
-    const value = (e.target as HTMLInputElement).value;
-    if(value === '') { setDisable(true) } else { setDisable(false) }
+    calcFib(values[inputName]);
+    setValues({[inputName]: ''})
   }
 
   const calcFib = (data: string) => {
@@ -62,16 +58,19 @@ export const FibonacciPage: React.FC = () => {
         <form className={style.form} onSubmit={onSubmit}>
           <Input
             type='number'
+            min='0'
             max='19'
             isLimitText={true}
-            onChange={onChange}
+            onChange={handleChange}
+            value={values[inputName]}
+            name={inputName}
           />
           <div>
           <Button
             text='Рассчитать'
             type='submit'
             isLoader={loader}
-            disabled={isDisable}
+            disabled={ !values[inputName] || +values[inputName] < 0 || +values[inputName] > 19 }
             extraClass='ml-6'
             linkedList="small"
           />
