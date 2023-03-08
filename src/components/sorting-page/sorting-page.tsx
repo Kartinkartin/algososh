@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, FormEventHandler, useEffect, useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { useForm } from "../../hooks/useForm";
 import { Direction } from "../../types/direction";
 import { ElementStates } from "../../types/element-states";
 import { Button } from "../ui/button/button";
@@ -13,14 +14,14 @@ export const SortingPage: React.FC = () => {
   const [inSorting, setSorting] = useState<[number, number] | []>([]);
   const [ascendLoader, setAscendLoader] = useState<boolean | undefined>(false);
   const [descendLoader, setDescendLoader] = useState<boolean | undefined>(false);
-  const sortType = (document.forms.namedItem('form')?.elements.namedItem('sortType') as RadioNodeList)?.value;
+  const inputName = 'sortType';
+  const { values, handleChange, setValues } = useForm({[inputName]: 'selectionSort'});
   const [sortedIndex, setSortedInex] = useState<number | null>(null);
 
   // учитывать выбор или Пузырек. 
   const ascendingSortHandler = () => {
     setAscendLoader(true);
-    const sortType = (document.forms.namedItem('form')?.elements.namedItem('sortType') as RadioNodeList)?.value;
-    if (sortType === 'selectionSort') {
+    if (values[inputName] === 'selectionSort') {
       selectionSortAscending([...arr]);
     } else {
       bubbleSortAscending([...arr]);
@@ -29,8 +30,7 @@ export const SortingPage: React.FC = () => {
 
   const descendingSortHandler = () => {
     setDescendLoader(true);
-    const sortType = (document.forms.namedItem('form')?.elements.namedItem('sortType') as RadioNodeList)?.value;
-    if (sortType === 'selectionSort') {
+    if (values[inputName] === 'selectionSort') {
       selectionSortDescending([...arr])
     } else {
       bubbleSortDescending([...arr])
@@ -144,9 +144,9 @@ export const SortingPage: React.FC = () => {
     if(inSorting.length) {
       if (inSorting.includes(index)) {
         return ElementStates.Changing
-      } else if(sortType === 'selectionSort' && sortedIndex) {
+      } else if(values[inputName] === 'selectionSort' && sortedIndex) {
         if (index < sortedIndex) { return ElementStates.Modified }
-      } else if(sortType === 'bubbleSort' && sortedIndex) {
+      } else if(values[inputName] === 'bubbleSort' && sortedIndex) {
         if (index > sortedIndex) { return ElementStates.Modified }
       } else {
         return ElementStates.Default
@@ -164,12 +164,12 @@ export const SortingPage: React.FC = () => {
 
   useEffect(()=> {
     console.log(sortedIndex)
-    if(sortType === 'selectionSort' && sortedIndex) {
+    if(values[inputName] === 'selectionSort' && sortedIndex) {
       if (sortedIndex === arr.length-2) {  
         setAscendLoader(false);
         setDescendLoader(false);
       }
-    } else if(sortType === 'bubbleSort' && sortedIndex) {
+    } else if(values[inputName] === 'bubbleSort' && sortedIndex) {
       if (sortedIndex === 1) {  
         setAscendLoader(false);
         setDescendLoader(false); 
@@ -181,8 +181,8 @@ export const SortingPage: React.FC = () => {
     <SolutionLayout title="Сортировка массива">
       <form className={style.form} name='form'>
         <fieldset className={style.checkboxes}>
-          <RadioInput label='Выбор' name='sortType' value='selectionSort' defaultChecked />
-          <RadioInput label='Пузырёк' name='sortType' value='bubbleSort'  />
+          <RadioInput label='Выбор' name='sortType' value='selectionSort' onChange={handleChange} defaultChecked />
+          <RadioInput label='Пузырёк' name='sortType' value='bubbleSort' onChange={handleChange}   />
         </fieldset>
         <div className={style.buttonsBox}>
           <div className={style.sortButtons}>

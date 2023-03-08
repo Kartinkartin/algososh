@@ -297,7 +297,7 @@ export const ListPage: React.FC = () => {
             linkedList="big"
             extraClass='ml-6 mr-6'
             onClick={addIndex}
-            disabled={!values[indexInput] || !values[valueInput]}
+            disabled={ !values[indexInput] || !values[valueInput] || +values[indexInput] >= list.getSize() }
             isLoader={isAdding || counter !== null} />
           <Button
             text='Удалить по индексу'
@@ -305,7 +305,7 @@ export const ListPage: React.FC = () => {
             linkedList="big"
             extraClass='mr-6'
             onClick={removeIndex}
-            disabled={!values[indexInput]}
+            disabled={ !values[indexInput] || +values[indexInput] >= list.getSize() }
             isLoader={isAdding || counter !== null} />
         </fieldset>
       </form>

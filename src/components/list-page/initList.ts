@@ -122,7 +122,6 @@ export class LinkedList<T> implements ILinkedList<T> {
         
     }
     removeTail() {
-        debugger
         let current;
         if (this.head !== null && this.head.next!==null) {
             current = this.head;
