@@ -5,13 +5,14 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { DELAY_IN_MS } from "../../constants/delays";
-import { ElementStates } from "../../types/element-states";
 import { useForm } from "../../hooks/useForm";
+import { reverseString, typeHandler } from "./utils";
 
 export const StringComponent: React.FC = () => {
   const [loader, setLoader] = useState<boolean>(false);
   const [letters, setLetters] = useState<Array<string> | null>(null)
   const [counter, setCounter] = useState<number>(-1);
+  const [iterations, setIterations] = useState<Array<Array<string>>> ([]);
   const name = 'stringInput';
   const { values, handleChange, setValues } = useForm({ [name]: '' });
 
@@ -27,52 +28,31 @@ export const StringComponent: React.FC = () => {
 
   const reverseFunc = (str: string) => {
     const arr = str.split('');
+    setIterations([...reverseString(arr)]);
     setLetters(arr);
-
+    setTimeout(setCounter, DELAY_IN_MS, 0);
+    let count = 0;
   }
 
-  //меняет местами два элемента 
-  const swap = (arr: Array<string>, index: number) => {
-    const tmp = arr[index];
-    arr[index] = arr[arr.length - 1 - index];
-    arr[arr.length - 1 - index] = tmp;
-  }
-
-  // устанавливает цвет
-  const typeHandler = (arr: Array<string>, index: number, counter: number) => {
-    if (index < counter || index > arr.length - 1 - counter) { 
-      return ElementStates.Modified 
-    }
-    if (index > counter && index < arr.length - 1 - counter) { 
-      return ElementStates.Default 
-    }
-    if (index === counter || index === arr.length - 1 - counter) { 
-      return ElementStates.Changing 
-    }
-  }
-
-  useEffect(()=>{
-    setValues({ [name]: ''})
-  }, [setValues])
+  
 
   useEffect(() => {
-    if (counter === -1) {
-      setTimeout(setCounter, DELAY_IN_MS, 0);
-    } else {
-      const index = counter;
-      if (letters?.length && index < letters.length/2) {
-        setTimeout(setLetters, DELAY_IN_MS, (letters: Array<string>) => {
-          const arr = [...letters];
-          swap(arr, index);
-          setCounter(index + 1);
-          return [...arr];
-        })
-      }
+    let nextStep: NodeJS.Timer;
+    if(letters?.length && counter > -1) {
+      nextStep = setTimeout(() => {
+        if (counter < letters.length/2 && iterations[counter]) {
+          setLetters(letters => iterations[counter]);
+          setCounter(counter => counter+1);
+        }
+      }, DELAY_IN_MS)
     }
     if(letters?.length && counter >= letters?.length/2) {
       setLoader(false);
     }
-  }, [letters, counter])
+    return ()=> {
+      clearTimeout(nextStep)
+    } 
+}, [counter, iterations, letters?.length])
 
   return (
     <SolutionLayout title="Строка">
