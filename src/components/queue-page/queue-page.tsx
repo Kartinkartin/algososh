@@ -107,6 +107,7 @@ export const QueuePage: React.FC = () => {
           <Button
             text="Удалить"
             type='button'
+            id='deleteBtn'
             onClick={onDelete} 
             isLoader={loader}
             disabled={head===null || tail===null || head === tail } />
