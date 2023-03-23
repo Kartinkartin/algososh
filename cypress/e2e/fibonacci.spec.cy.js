@@ -23,9 +23,9 @@ describe('testing Fibonacci component', () => {
     cy.clock(new Date(), ['Date']);
     cy.wait(SHORT_DELAY_IN_MS);
 
-    // cy.get('ul>li>div').should('have.length', '1').then((els) => {
-    //   cy.get(els[0]).get('div[class*="circle_circle"]>p').should('have.text', '1');
-    // })
+    cy.get('ul>li>div').should('have.length', '1').then((els) => {
+      cy.get(els[0]).get('div[class*="circle_circle"]>p').should('have.text', '1');
+    })
 
     cy.wait(SHORT_DELAY_IN_MS);
 

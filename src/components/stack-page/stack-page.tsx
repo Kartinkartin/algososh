@@ -84,8 +84,9 @@ export const StackPage: React.FC = () => {
             disabled={!values[nameInput]}
           />
           <Button
-            text="Удалить"
+            text='Удалить'
             type='button'
+            id='deleteBtn'
             isLoader={loader}
             onClick={onDelete}
             disabled={!items.length}  />
