@@ -28,37 +28,42 @@ describe('testing Fibonacci component', () => {
     cy.get('button[type=submit]').click();
 
     // проверка содержания и наличия указателя на элементе на начало и конец очереди
-    cy.get('ul>li>div>div').should('have.text', 'headAtail')
-    // проверка цветов
-    cy.get('div[class*=circle_circle]').then(([$zero, ...$els]) => {
-      expect($zero.className).contains('changing');
-      cy.get($els).each(($el) => {
-        expect($el[0].className).contains('default')
+    cy.get('ul').within(() => {
+      cy.get('div[class*=circle_content]>div').should('have.text', 'headAtail');
+      // проверка цветов
+      cy.get('div[class*=circle_circle]').then(([$zero, ...$els]) => {
+        expect($zero.className).contains('changing');
+        cy.get($els).each(($el) => {
+          expect($el[0].className).contains('default')
+        })
       })
-    })
-    cy.wait(SHORT_DELAY_IN_MS)
-    cy.get('div[class*=circle_circle]').should(($els) => {
-      expect($els).to.have.length(6);
-      expect($els[0].className).contains('default');
+      cy.wait(SHORT_DELAY_IN_MS)
+      cy.get('div[class*=circle_circle]').should(($els) => {
+        expect($els).to.have.length(6);
+        expect($els[0].className).contains('default');
+      })
     })
 
     cy.get('input').type('B');
     cy.get('button[type=submit]').click();
 
     cy.get('ul>li').should('have.length', 6);
-    // проверка содержания и указания на голову стека
-    cy.get('ul>li>div>div').should('have.text', 'headABtail')
-    // проверка цветов
-    cy.get('div[class*=circle_circle]').should(($els) => {
-      expect($els).to.have.length(6);
-      expect($els[0].className).contains('default');
-      expect($els[1].className).contains('changing');
-      expect($els[2].className).contains('default');
+    cy.get('ul').within(() => {
+      // проверка содержания и указания на голову стека
+      cy.get('div[class*=circle_content]>div').should('have.text', 'headABtail')
+      // проверка цветов
+      cy.get('div[class*=circle_circle]').should(($els) => {
+        expect($els).to.have.length(6);
+        expect($els[0].className).contains('default');
+        expect($els[1].className).contains('changing');
+        expect($els[2].className).contains('default');
+      })
+      cy.wait(SHORT_DELAY_IN_MS)
+      cy.get('div[class*=circle_circle]').each(($el) => {
+        expect($el[0].className).contains('default');
+      })
     })
-    cy.wait(SHORT_DELAY_IN_MS)
-    cy.get('div[class*=circle_circle]').each(($el) => {
-      expect($el[0].className).contains('default');
-    })
+    
   })
 
   it('correct deleting element from queue', () => {
@@ -86,7 +91,9 @@ describe('testing Fibonacci component', () => {
     cy.get('input').type('B');
     cy.get('button[type=submit]').click();
     cy.get('button[type=reset]').should('not.be.disabled')
-    cy.get('ul>li>div>div').should('have.text', 'headABtail');
+    cy.get('ul').within(() => {
+      cy.get('div[class*=circle_content]>div').should('have.text', 'headABtail');
+    })
     cy.wait(SHORT_DELAY_IN_MS);
     cy.get('button[type=reset]').click();
     cy.get('ul>div').should('have.length', 0);
