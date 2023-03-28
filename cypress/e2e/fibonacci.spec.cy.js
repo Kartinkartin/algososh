@@ -1,4 +1,5 @@
 import { SHORT_DELAY_IN_MS } from "../../src/constants/delays";
+import { btnSubmit, circleElemContent } from "./constants";
 
 describe('testing Fibonacci component', () => {
   beforeEach(()=>{
@@ -7,7 +8,7 @@ describe('testing Fibonacci component', () => {
 
   it('empty input with disapled button', () => {
     cy.get('input').as('input');
-    cy.get('button[type=submit]').as('button')
+    cy.get(btnSubmit).as('button')
     cy.get('@input').should('have.value', '');
     cy.get('@button').should('be.disabled');
     cy.get('@input').type('1');
@@ -18,31 +19,31 @@ describe('testing Fibonacci component', () => {
 
   it('correct generation numbers', () => {
     cy.get('input').type('3');
-    cy.get('button[type=submit]').as('button')
+    cy.get(btnSubmit).as('button')
     cy.get('@button').click();
     cy.clock(new Date(), ['Date']);
     cy.wait(SHORT_DELAY_IN_MS);
 
     cy.get('ul>li').should('have.length', '1').then((els) => {
-      cy.get(els[0]).get('div[class*="circle_circle"]>p').should('have.text', '1');
+      cy.get(els[0]).get(circleElemContent).should('have.text', '1');
     })
 
     cy.wait(SHORT_DELAY_IN_MS);
 
     cy.get('ul>li').should('have.length', '2').then((els) => {
-      cy.get(els).get('div[class*="circle_circle"]>p').should('have.text', '11')
+      cy.get(els).get(circleElemContent).should('have.text', '11')
     })
 
     cy.wait(SHORT_DELAY_IN_MS);
 
     cy.get('ul>li').should('have.length', '3').then((els) => {
-      cy.get(els).get('div[class*="circle_circle"]>p').should('have.text', '112')
+      cy.get(els).get(circleElemContent).should('have.text', '112')
     })
 
     cy.wait(SHORT_DELAY_IN_MS);
 
     cy.get('ul>li').should('have.length', '4').then((els) => {
-      cy.get(els).get('div[class*="circle_circle"]>p').should('have.text', '1123')
+      cy.get(els).get(circleElemContent).should('have.text', '1123')
     })
   })
 })
