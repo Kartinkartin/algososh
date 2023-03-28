@@ -8,14 +8,10 @@ import { Circle } from "../ui/circle/circle";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
+import { list } from "./constants";
 import { LinkedList, TPoint } from "./initList";
 import styles from './list-page.module.css';
 
-const list = new LinkedList<TPoint>();
-const initItems = ['0', '34', '8', '1'];
-for (let item of initItems) {
-  list.appendTail({ value: item, state: ElementStates.Default });
-}
 
 export const ListPage: React.FC = () => {
   const [counter, setCounter] = useState<number | null>(null);
@@ -248,6 +244,7 @@ export const ListPage: React.FC = () => {
           <Button
             text='Добавить в head'
             type='button'
+            id='headAddBtn'
             linkedList="small"
             extraClass='ml-6 mr-6'
             onClick={addToHead}
@@ -256,6 +253,7 @@ export const ListPage: React.FC = () => {
           <Button
             text='Добавить в tail'
             type='button'
+            id='tailAddBtn'
             linkedList="small"
             extraClass='mr-6'
             onClick={addToTail}
@@ -264,6 +262,7 @@ export const ListPage: React.FC = () => {
           <Button
             text='Удалить из head'
             type='button'
+            id='headDelBtn'
             linkedList="small"
             extraClass='mr-6'
             onClick={deleteHead}
@@ -272,6 +271,7 @@ export const ListPage: React.FC = () => {
           <Button
             text='Удалить из tail'
             type='button'
+            id='tailDelBtn'
             linkedList="small"
             extraClass='mr-6'
             onClick={deleteTail}
@@ -294,6 +294,7 @@ export const ListPage: React.FC = () => {
           <Button
             text='Добавить по индексу'
             type='button'
+            id='indexAddBtn'
             linkedList="big"
             extraClass='ml-6 mr-6'
             onClick={addIndex}
@@ -302,6 +303,7 @@ export const ListPage: React.FC = () => {
           <Button
             text='Удалить по индексу'
             type='button'
+            id='indexDelBtn'
             linkedList="big"
             extraClass='mr-6'
             onClick={removeIndex}

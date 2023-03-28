@@ -6,6 +6,7 @@ import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import style from './fibonacci-page.module.css';
+import { fib } from "./utils";
 
 export const FibonacciPage: React.FC = () => {
   const [items, setItems] = useState<Array<number>>([]);
@@ -26,16 +27,6 @@ export const FibonacciPage: React.FC = () => {
     if (Number.isNaN(data)) { return null }
     setN(Number(data));
   }
-  const fib = (n: number, memo: Record<number, number> = {}): number => {
-    if (n in memo) {
-      return memo[n];
-    }
-    if (n < 2) {
-      return 1;
-    }
-    memo[n] = fib(n - 1, memo) + fib(n - 2, memo);
-    return memo[n];
-  };
 
   useEffect(() => {
     if (n !== undefined && items.length <= n) {
